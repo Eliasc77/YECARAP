@@ -1,0 +1,14 @@
+managed implementation in class zbp_r_travel_lgl unique;
+strict ( 2 );
+
+define behavior for Z_R_TRAVEL_LGL //alias <alias_name>
+persistent table ztravel_lgl
+lock master
+authorization master ( instance )
+//etag master <field_name>
+{
+  create ( authorization : global );
+  update;
+  delete;
+  field ( readonly ) TravelUUid;
+}
