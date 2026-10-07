@@ -12,17 +12,27 @@ authorization master ( instance )
   create ( authorization : global );
   update;
   delete;
-  field ( numbering: managed, readonly ) TravelUUid;
+  field ( numbering : managed, readonly ) TravelUUid;
 
   field ( readonly ) TravelID,
-                     OverallStatus,
-                     LastChangedAt,
-                     LocalCreatedAt,
-                     LocalCreatedBy,
-                     LocalLastChangedAt,
-                     LocalLastChangedBy;
+  OverallStatus,
+  LastChangedAt,
+  LocalCreatedAt,
+  LocalCreatedBy,
+  LocalLastChangedAt,
+  LocalLastChangedBy;
 
   field ( mandatory ) CustomerID, AgencyID, BeginDate, EndDate, CurrencyCode;
+
+  field ( features : instance ) BookingFee;
+
+  action ( features : instance, authorization : update ) acceptTravel result [1] $self;
+  action ( features : instance, authorization : update ) rejectTravel result [1] $self;
+
+  action ( authorization : update ) deductDiscount
+    parameter Z_AE_TRAVEL_DISCOUNT_LGL result [1] $self;
+
+  internal action reCaclTotalPrice;
 
   mapping for ztravel_lgl
     {
