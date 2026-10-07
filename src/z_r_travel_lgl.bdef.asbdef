@@ -4,13 +4,25 @@ strict ( 2 );
 define behavior for Z_R_TRAVEL_LGL //alias <alias_name>
 persistent table ztravel_lgl
 lock master
+//total etag LastChangedAt
+etag master LocalLastChangedAt
 authorization master ( instance )
 //etag master <field_name>
 {
   create ( authorization : global );
   update;
   delete;
-  field ( readonly ) TravelUUid;
+  field ( numbering: managed, readonly ) TravelUUid;
+
+  field ( readonly ) TravelID,
+                     OverallStatus,
+                     LastChangedAt,
+                     LocalCreatedAt,
+                     LocalCreatedBy,
+                     LocalLastChangedAt,
+                     LocalLastChangedBy;
+
+  field ( mandatory ) CustomerID, AgencyID, BeginDate, EndDate, CurrencyCode;
 
   mapping for ztravel_lgl
     {
