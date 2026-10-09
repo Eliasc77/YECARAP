@@ -1,10 +1,13 @@
 managed implementation in class zbp_r_travel_lgl unique;
 strict ( 2 );
+with draft;
 
 define behavior for Z_R_TRAVEL_LGL //alias <alias_name>
 persistent table ztravel_lgl
+draft table ztravel_lgld
 lock master
-//total etag LastChangedAt
+ total etag LastChangedAt
+
 etag master LocalLastChangedAt
 authorization master ( instance )
 //etag master <field_name>
@@ -16,6 +19,7 @@ authorization master ( instance )
 
   field ( readonly ) TravelID,
   OverallStatus,
+  TotalPrice,
   LastChangedAt,
   LocalCreatedAt,
   LocalCreatedBy,
@@ -33,6 +37,38 @@ authorization master ( instance )
     parameter Z_AE_TRAVEL_DISCOUNT_LGL result [1] $self;
 
   internal action reCaclTotalPrice;
+
+  validation validateCustomer on save { create; field CustomerID; }
+  validation validateAgency on save { create; field AgencyID; }
+  validation validateDateRange on save { create; field BeginDate, EndDate; }
+
+  determination setTravelNumber on save { create; }
+  determination setStatusToOpen on modify { create; }
+  determination calculateTotalPrice on modify { create; field BookingFee, CurrencyCode; }
+
+  determine action validateCustomerID{ validation validateCustomer; }
+  determine action validateAgencyID{ validation validateAgency; }
+  determine action validateDates{ validation validateDateRange; }
+
+  side effects
+  {
+    field BookingFee affects field TotalPrice;
+    determine action validateCustomerID executed on field CustomerID affects messages;
+    determine action validateAgencyID executed on field AgencyID affects messages;
+    determine action validateDates executed on field BeginDate, field EndDate affects messages;
+  }
+
+  draft action Resume;
+  draft action Edit;
+  draft action Activate optimized;
+  draft action Discard;
+
+  draft determine action Prepare{
+    validation validateCustomer;
+    validation validateAgency;
+    validation validateDateRange;
+  }
+
 
   mapping for ztravel_lgl
     {
